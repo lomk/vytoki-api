@@ -42,8 +42,8 @@ class Service(models.Model):
 
 
 class ServiceImage(models.Model):
-    section = models.ForeignKey(Service, on_delete=models.CASCADE, related_name="images")
-    image = models.ImageField(upload_to="sections/%Y/%m/")
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name="images")
+    image = models.ImageField(upload_to="services/%Y/%m/")
 
     # English
     alt_en = models.CharField(max_length=200, blank=True)
@@ -60,11 +60,11 @@ class ServiceImage(models.Model):
         ordering = ["sort", "id"]
 
     def __str__(self):
-        return f"{self.section.slug} #{self.id}"
+        return f"{self.service.slug} #{self.id}"
 
 
 class ServiceArticle(models.Model):
-    section = models.ForeignKey(Service, on_delete=models.CASCADE, related_name="articles")
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name="articles")
 
     # English
     title_en = models.CharField(max_length=200, blank=True)
@@ -95,7 +95,7 @@ class ServiceArticle(models.Model):
         ordering = ["sort", "id"]
 
     def __str__(self):
-        return f"{self.section.slug} - {self.title}"
+        return f"{self.service.slug} - {self.title}"
 
 
 class ServiceArticleImage(models.Model):
