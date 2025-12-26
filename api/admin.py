@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import ServiceArticle, ServiceArticleImage, Contacts, Service, ServiceImage
+from .models import Service, ServiceImage, ServiceArticle, ServiceArticleImage, Contacts
 
 class ServiceImageInline(admin.TabularInline):
     model = ServiceImage
@@ -22,7 +22,7 @@ class ServiceAdmin(admin.ModelAdmin):
     list_filter = ("is_published",)
     search_fields = ("slug", "title_en", "title_uk", "title_ru", "body_en", "body_uk", "body_ru")
     fieldsets = (
-        ('Section Info', {
+        ('Service Info', {
             'fields': ('slug', 'is_published')
         }),
         ('English', {
@@ -31,8 +31,8 @@ class ServiceAdmin(admin.ModelAdmin):
         ('Ukrainian', {
             'fields': ('title_uk', 'subtitle_uk', 'body_uk', 'seo_title_uk', 'seo_description_uk')
         }),
-        ('Russian', {
-            'fields': ('title_ru', 'subtitle_ru', 'body_ru', 'seo_title_ru', 'seo_description_ru')
+        ('German', {
+            'fields': ('title_de', 'subtitle_de', 'body_de', 'seo_title_de', 'seo_description_de')
         }),
     )
     inlines = [ServiceImageInline, ServiceArticleInline]
@@ -52,17 +52,37 @@ class ServiceArticleAdmin(admin.ModelAdmin):
         ('Ukrainian', {
             'fields': ('title_uk', 'subtitle_uk', 'text_uk', 'seo_title_uk', 'seo_description_uk')
         }),
-        ('Russian', {
-            'fields': ('title_ru', 'subtitle_ru', 'text_ru', 'seo_title_ru', 'seo_description_ru')
+        ('German', {
+            'fields': ('title_de', 'subtitle_de', 'text_de', 'seo_title_de', 'seo_description_de')
         }),
     )
     inlines = [ServiceArticleImageInline]
+
+@admin.register(ServiceImage)
+class ServiceImageAdmin(admin.ModelAdmin):
+    list_display = ("service", "sort", "alt_en")
+    list_filter = ("service",)
+    search_fields = ("service__slug", "alt_en", "alt_uk", "alt_de")
+    fieldsets = (
+        ('Image Info', {
+            'fields': ('service', 'image', 'sort')
+        }),
+        ('Alt Text - English', {
+            'fields': ('alt_en',)
+        }),
+        ('Alt Text - Ukrainian', {
+            'fields': ('alt_uk',)
+        }),
+        ('Alt Text - German', {
+            'fields': ('alt_de',)
+        }),
+    )
 
 @admin.register(ServiceArticleImage)
 class ServiceArticleImageAdmin(admin.ModelAdmin):
     list_display = ("article", "sort", "alt_en")
     list_filter = ("article__service",)
-    search_fields = ("article__title_en", "article__title_uk", "article__title_ru", "alt_en", "alt_uk", "alt_ru")
+    search_fields = ("article__title_en", "article__title_uk", "article__title_de", "alt_en", "alt_uk", "alt_de")
     fieldsets = (
         ('Image Info', {
             'fields': ('article', 'image', 'sort')
@@ -73,15 +93,15 @@ class ServiceArticleImageAdmin(admin.ModelAdmin):
         ('Alt Text - Ukrainian', {
             'fields': ('alt_uk',)
         }),
-        ('Alt Text - Russian', {
-            'fields': ('alt_ru',)
+        ('Alt Text - German', {
+            'fields': ('alt_de',)
         }),
     )
 
 @admin.register(Contacts)
 class ContactsAdmin(admin.ModelAdmin):
     list_display = ("title_en", "phone1", "phone2", "phone3", "updated_at")
-    search_fields = ("title_en", "title_uk", "title_ru", "phone1", "phone2", "phone3")
+    search_fields = ("title_en", "title_uk", "title_de", "phone1", "phone2", "phone3")
     fieldsets = (
         ('Contact Info', {
             'fields': ('phone1', 'phone2', 'phone3')
@@ -92,7 +112,7 @@ class ContactsAdmin(admin.ModelAdmin):
         ('Ukrainian', {
             'fields': ('title_uk', 'text_uk', 'address_uk')
         }),
-        ('Russian', {
-            'fields': ('title_ru', 'text_ru', 'address_ru')
+        ('German', {
+            'fields': ('title_de', 'text_de', 'address_de')
         }),
     )
