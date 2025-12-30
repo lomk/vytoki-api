@@ -32,7 +32,7 @@ class ServiceAdmin(admin.ModelAdmin):
             'fields': ('title_uk', 'subtitle_uk', 'body_uk', 'seo_title_uk', 'seo_description_uk')
         }),
         ('Russian', {
-            'fields': ('title_de', 'subtitle_de', 'body_de', 'seo_title_de', 'seo_description_de')
+            'fields': ('title_ru', 'subtitle_ru', 'body_ru', 'seo_title_ru', 'seo_description_ru')
         }),
     )
     inlines = [ServiceImageInline, ServiceArticleInline]
