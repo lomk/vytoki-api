@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import Service, ServiceArticle, Contacts, LANGUAGES
+from .models import Section, Service, Contacts, LANGUAGES
 
 def get_language(request):
     """Get language from query parameter, default to 'en'"""
@@ -116,11 +116,60 @@ def service_detail(request, slug: str):
     return Response(data)
 
 @api_view(["GET"])
-def articles_list(request, service_slug: str):
+def section_detail(request, slug: str):
+    lang = get_language(request)
+    s = Section.objects.filter(is_published=True, slug=slug).first()
+    if not s:
+        return Response({"detail": "Not found"}, status=404)
+
+    data = {
+        "slug": s.slug,
+        "title": get_field(s, "title", lang),
+        "subtitle": get_field(s, "subtitle", lang),
+        "body": get_field(s, "body", lang),
+        "seo_title": get_field(s, "seo_title", lang),
+        "seo_description": get_field(s, "seo_description", lang),
+        "updated_at": s.updated_at,
+        "images": [
+            {
+                "id": img.id,
+                "image": img.image.url,
+                "alt": get_field(img, "alt", lang),
+                "sort": img.sort
+            }
+            for img in s.images.all()
+        ],
+        "articles": [
+            {
+                "id": a.id,
+                "title": get_field(a, "title", lang),
+                "subtitle": get_field(a, "subtitle", lang),
+                "text": get_field(a, "text", lang),
+                "seo_title": get_field(a, "seo_title", lang),
+                "seo_description": get_field(a, "seo_description", lang),
+                "sort": a.sort,
+                "updated_at": a.updated_at,
+                "images": [
+                    {
+                        "id": img.id,
+                        "image": img.image.url,
+                        "alt": get_field(img, "alt", lang),
+                        "sort": img.sort
+                    }
+                    for img in a.images.all()
+                ],
+            }
+            for a in s.articles.filter(is_published=True)
+        ],
+    }
+    return Response(data)
+
+@api_view(["GET"])
+def service_articles_list(request, service_slug: str):
     lang = get_language(request)
     service = Service.objects.filter(is_published=True, slug=service_slug).first()
     if not service:
-        return Response({"detail": "Section not found"}, status=404)
+        return Response({"detail": "Service not found"}, status=404)
 
     articles = service.articles.filter(is_published=True)
     data = [
@@ -146,7 +195,37 @@ def articles_list(request, service_slug: str):
     return Response(data)
 
 @api_view(["GET"])
-def article_detail(request, service_slug: str, article_id: int):
+def section_articles_list(request, section_slug: str):
+    lang = get_language(request)
+    section = Section.objects.filter(is_published=True, slug=section_slug).first()
+    if not section:
+        return Response({"detail": "Section not found"}, status=404)
+
+    articles = section.articles.filter(is_published=True)
+    data = [
+        {
+            "id": a.id,
+            "title": get_field(a, "title", lang),
+            "subtitle": get_field(a, "subtitle", lang),
+            "text": get_field(a, "text", lang),
+            "sort": a.sort,
+            "updated_at": a.updated_at,
+            "images": [
+                {
+                    "id": img.id,
+                    "image": img.image.url,
+                    "alt": get_field(img, "alt", lang),
+                    "sort": img.sort
+                }
+                for img in a.images.all()
+            ],
+        }
+        for a in articles
+    ]
+    return Response(data)
+
+@api_view(["GET"])
+def service_article_detail(request, service_slug: str, article_id: int):
     lang = get_language(request)
     service = Service.objects.filter(is_published=True, slug=service_slug).first()
     if not service:

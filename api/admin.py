@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Service, ServiceImage, ServiceArticle, ServiceArticleImage, Contacts
+from .models import Service, ServiceImage, ServiceArticle, ServiceArticleImage, Contacts, Section, SectionArticle, SectionImage, SectionArticleImage
 
 class ServiceImageInline(admin.TabularInline):
     model = ServiceImage
@@ -82,6 +82,81 @@ class ServiceImageAdmin(admin.ModelAdmin):
 class ServiceArticleImageAdmin(admin.ModelAdmin):
     list_display = ("article", "sort", "alt_en")
     list_filter = ("article__service",)
+    search_fields = ("article__title_en", "article__title_uk", "article__title_ru", "alt_en", "alt_uk", "alt_ru")
+    fieldsets = (
+        ('Image Info', {
+            'fields': ('article', 'image', 'sort')
+        }),
+        ('Alt Text - English', {
+            'fields': ('alt_en',)
+        }),
+        ('Alt Text - Ukrainian', {
+            'fields': ('alt_uk',)
+        }),
+        ('Alt Text - Russian', {
+            'fields': ('alt_ru',)
+        }),
+    )
+
+class SectionImageInline(admin.TabularInline):
+    model = SectionImage
+    extra = 1
+
+class SectionArticleImageInline(admin.TabularInline):
+    model = SectionArticleImage
+    extra = 1
+
+class SectionArticleInline(admin.TabularInline):
+    model = SectionArticle
+    extra = 1
+    fields = ("title_en", "text_en", "sort", "is_published")
+
+@admin.register(Section)
+class SectionAdmin(admin.ModelAdmin):
+    list_display = ("slug", "title_en", "is_published", "updated_at")
+    list_filter = ("is_published",)
+    search_fields = ("slug", "title_en", "title_uk", "title_ru", "body_en", "body_uk", "body_ru")
+    fieldsets = (
+        ('Service Info', {
+            'fields': ('slug', 'is_published')
+        }),
+        ('English', {
+            'fields': ('title_en', 'subtitle_en', 'body_en', 'seo_title_en', 'seo_description_en')
+        }),
+        ('Ukrainian', {
+            'fields': ('title_uk', 'subtitle_uk', 'body_uk', 'seo_title_uk', 'seo_description_uk')
+        }),
+        ('Russian', {
+            'fields': ('title_ru', 'subtitle_ru', 'body_ru', 'seo_title_ru', 'seo_description_ru')
+        }),
+    )
+    inlines = [SectionImageInline, SectionArticleInline]
+
+@admin.register(SectionArticle)
+class SectionArticleAdmin(admin.ModelAdmin):
+    list_display = ("title_en", "section", "sort", "is_published", "updated_at")
+    list_filter = ("is_published", "section")
+    search_fields = ("title_en", "title_uk", "title_ru", "text_en", "text_uk", "text_ru")
+    fieldsets = (
+        ('Article Info', {
+            'fields': ('service', 'sort', 'is_published')
+        }),
+        ('English', {
+            'fields': ('title_en', 'subtitle_en', 'text_en', 'seo_title_en', 'seo_description_en')
+        }),
+        ('Ukrainian', {
+            'fields': ('title_uk', 'subtitle_uk', 'text_uk', 'seo_title_uk', 'seo_description_uk')
+        }),
+        ('Russian', {
+            'fields': ('title_ru', 'subtitle_ru', 'text_ru', 'seo_title_ru', 'seo_description_ru')
+        }),
+    )
+    inlines = [SectionArticleImageInline]
+
+@admin.register(SectionArticleImage)
+class SectionArticleImageAdmin(admin.ModelAdmin):
+    list_display = ("article", "sort", "alt_en")
+    list_filter = ("article__section",)
     search_fields = ("article__title_en", "article__title_uk", "article__title_ru", "alt_en", "alt_uk", "alt_ru")
     fieldsets = (
         ('Image Info', {
