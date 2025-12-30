@@ -31,7 +31,7 @@ class ServiceAdmin(admin.ModelAdmin):
         ('Ukrainian', {
             'fields': ('title_uk', 'subtitle_uk', 'body_uk', 'seo_title_uk', 'seo_description_uk')
         }),
-        ('German', {
+        ('Russian', {
             'fields': ('title_de', 'subtitle_de', 'body_de', 'seo_title_de', 'seo_description_de')
         }),
     )
@@ -52,8 +52,8 @@ class ServiceArticleAdmin(admin.ModelAdmin):
         ('Ukrainian', {
             'fields': ('title_uk', 'subtitle_uk', 'text_uk', 'seo_title_uk', 'seo_description_uk')
         }),
-        ('German', {
-            'fields': ('title_de', 'subtitle_de', 'text_de', 'seo_title_de', 'seo_description_de')
+        ('Russian', {
+            'fields': ('title_ru', 'subtitle_ru', 'text_ru', 'seo_title_ru', 'seo_description_ru')
         }),
     )
     inlines = [ServiceArticleImageInline]
@@ -62,7 +62,7 @@ class ServiceArticleAdmin(admin.ModelAdmin):
 class ServiceImageAdmin(admin.ModelAdmin):
     list_display = ("service", "sort", "alt_en")
     list_filter = ("service",)
-    search_fields = ("service__slug", "alt_en", "alt_uk", "alt_de")
+    search_fields = ("service__slug", "alt_en", "alt_uk", "alt_ru")
     fieldsets = (
         ('Image Info', {
             'fields': ('service', 'image', 'sort')
@@ -73,8 +73,8 @@ class ServiceImageAdmin(admin.ModelAdmin):
         ('Alt Text - Ukrainian', {
             'fields': ('alt_uk',)
         }),
-        ('Alt Text - German', {
-            'fields': ('alt_de',)
+        ('Alt Text - Russian', {
+            'fields': ('alt_ru',)
         }),
     )
 
@@ -82,7 +82,7 @@ class ServiceImageAdmin(admin.ModelAdmin):
 class ServiceArticleImageAdmin(admin.ModelAdmin):
     list_display = ("article", "sort", "alt_en")
     list_filter = ("article__service",)
-    search_fields = ("article__title_en", "article__title_uk", "article__title_de", "alt_en", "alt_uk", "alt_de")
+    search_fields = ("article__title_en", "article__title_uk", "article__title_ru", "alt_en", "alt_uk", "alt_ru")
     fieldsets = (
         ('Image Info', {
             'fields': ('article', 'image', 'sort')
@@ -93,15 +93,15 @@ class ServiceArticleImageAdmin(admin.ModelAdmin):
         ('Alt Text - Ukrainian', {
             'fields': ('alt_uk',)
         }),
-        ('Alt Text - German', {
-            'fields': ('alt_de',)
+        ('Alt Text - Russian', {
+            'fields': ('alt_ru',)
         }),
     )
 
 @admin.register(Contacts)
 class ContactsAdmin(admin.ModelAdmin):
     list_display = ("title_en", "phone1", "phone2", "phone3", "updated_at")
-    search_fields = ("title_en", "title_uk", "title_de", "phone1", "phone2", "phone3")
+    search_fields = ("title_en", "title_uk", "title_ru", "phone1", "phone2", "phone3")
     fieldsets = (
         ('Contact Info', {
             'fields': ('phone1', 'phone2', 'phone3')
@@ -112,7 +112,7 @@ class ContactsAdmin(admin.ModelAdmin):
         ('Ukrainian', {
             'fields': ('title_uk', 'text_uk', 'address_uk')
         }),
-        ('German', {
-            'fields': ('title_de', 'text_de', 'address_de')
+        ('Russian', {
+            'fields': ('title_ru', 'text_ru', 'address_ru')
         }),
     )
