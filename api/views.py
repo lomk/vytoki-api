@@ -1,4 +1,4 @@
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import ensure_csrf_cookie
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import Section, Service, Contacts, BlogPost, FAQ, PricingPlan, ConsultationRequest, LANGUAGES
@@ -87,6 +87,7 @@ def health(request):
 
 # ─── Services ───────────────────────────────────────────────────────────────
 
+@ensure_csrf_cookie
 @api_view(["GET"])
 def service_list(request):
     lang = get_language(request)
@@ -325,7 +326,6 @@ def pricing_list(request):
 
 # ─── Consultations ────────────────────────────────────────────────────────────
 
-@csrf_exempt
 @api_view(["POST"])
 def consultation_create(request):
     name = (request.data.get("name") or "").strip()
