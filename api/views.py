@@ -1,3 +1,4 @@
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import Section, Service, Contacts, BlogPost, FAQ, PricingPlan, ConsultationRequest, LANGUAGES
@@ -324,6 +325,7 @@ def pricing_list(request):
 
 # ─── Consultations ────────────────────────────────────────────────────────────
 
+@csrf_exempt
 @api_view(["POST"])
 def consultation_create(request):
     name = (request.data.get("name") or "").strip()
