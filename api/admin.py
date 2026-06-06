@@ -1,193 +1,178 @@
 from django.contrib import admin
-from .models import Service, ServiceImage, ServiceArticle, ServiceArticleImage, Contacts, Section, SectionArticle, SectionImage, SectionArticleImage
+from .models import (
+    Service, ServiceImage, ServiceArticle, ServiceArticleImage,
+    Section, SectionImage, SectionArticle, SectionArticleImage,
+    Contacts, BlogPost, FAQ, PricingPlan, ConsultationRequest,
+)
+
+
+# ─── Service ─────────────────────────────────────────────────────────────────
 
 class ServiceImageInline(admin.TabularInline):
     model = ServiceImage
     extra = 1
     fields = ("image", "alt_en", "alt_uk", "alt_ru", "sort")
 
-class ServiceArticleImageInline(admin.TabularInline):
-    model = ServiceArticleImage
-    extra = 1
-    fields = ("image", "alt_en", "alt_uk", "alt_ru", "sort")
 
 class ServiceArticleInline(admin.TabularInline):
     model = ServiceArticle
     extra = 1
-    fields = ("title_en", "title_uk", "title_ru", "sort", "is_published")
+    fields = ("title_uk", "title_en", "sort", "is_published")
+    show_change_link = True
+
 
 @admin.register(Service)
 class ServiceAdmin(admin.ModelAdmin):
-    list_display = ("slug", "title_en", "is_published", "updated_at")
+    list_display = ("slug", "title_uk", "title_en", "is_published", "updated_at")
     list_filter = ("is_published",)
-    search_fields = ("slug", "title_en", "title_uk", "title_ru", "body_en", "body_uk", "body_ru")
+    search_fields = ("slug", "title_en", "title_uk", "title_ru")
+    prepopulated_fields = {"slug": ("title_en",)}
     fieldsets = (
-        ('Service Info', {
-            'fields': ('slug', 'is_published')
-        }),
-        ('English', {
-            'fields': ('title_en', 'subtitle_en', 'body_en', 'seo_title_en', 'seo_description_en')
-        }),
-        ('Ukrainian', {
-            'fields': ('title_uk', 'subtitle_uk', 'body_uk', 'seo_title_uk', 'seo_description_uk')
-        }),
-        ('Russian', {
-            'fields': ('title_ru', 'subtitle_ru', 'body_ru', 'seo_title_ru', 'seo_description_ru')
-        }),
+        ("Meta", {"fields": ("slug", "is_published")}),
+        ("Ukrainian", {"fields": ("title_uk", "subtitle_uk", "body_uk", "seo_title_uk", "seo_description_uk")}),
+        ("English", {"fields": ("title_en", "subtitle_en", "body_en", "seo_title_en", "seo_description_en")}),
+        ("Russian", {"fields": ("title_ru", "subtitle_ru", "body_ru", "seo_title_ru", "seo_description_ru")}),
     )
     inlines = [ServiceImageInline, ServiceArticleInline]
 
+
 @admin.register(ServiceArticle)
 class ServiceArticleAdmin(admin.ModelAdmin):
-    list_display = ("title_en", "service", "sort", "is_published", "updated_at")
+    list_display = ("title_uk", "service", "sort", "is_published", "updated_at")
     list_filter = ("is_published", "service")
-    search_fields = ("title_en", "title_uk", "title_ru", "text_en", "text_uk", "text_ru")
+    search_fields = ("title_en", "title_uk", "title_ru")
     fieldsets = (
-        ('Article Info', {
-            'fields': ('service', 'sort', 'is_published')
-        }),
-        ('English', {
-            'fields': ('title_en', 'subtitle_en', 'text_en', 'seo_title_en', 'seo_description_en')
-        }),
-        ('Ukrainian', {
-            'fields': ('title_uk', 'subtitle_uk', 'text_uk', 'seo_title_uk', 'seo_description_uk')
-        }),
-        ('Russian', {
-            'fields': ('title_ru', 'subtitle_ru', 'text_ru', 'seo_title_ru', 'seo_description_ru')
-        }),
+        ("Meta", {"fields": ("service", "sort", "is_published")}),
+        ("Ukrainian", {"fields": ("title_uk", "subtitle_uk", "text_uk", "seo_title_uk", "seo_description_uk")}),
+        ("English", {"fields": ("title_en", "subtitle_en", "text_en", "seo_title_en", "seo_description_en")}),
+        ("Russian", {"fields": ("title_ru", "subtitle_ru", "text_ru", "seo_title_ru", "seo_description_ru")}),
     )
-    inlines = [ServiceArticleImageInline]
+    inlines = [
+        type("ServiceArticleImageInline", (admin.TabularInline,), {
+            "model": ServiceArticleImage, "extra": 1,
+            "fields": ("image", "alt_en", "alt_uk", "alt_ru", "sort"),
+        })
+    ]
 
-@admin.register(ServiceImage)
-class ServiceImageAdmin(admin.ModelAdmin):
-    list_display = ("service", "sort", "alt_en")
-    list_filter = ("service",)
-    search_fields = ("service__slug", "alt_en", "alt_uk", "alt_ru")
-    fieldsets = (
-        ('Image Info', {
-            'fields': ('service', 'image', 'sort')
-        }),
-        ('Alt Text - English', {
-            'fields': ('alt_en',)
-        }),
-        ('Alt Text - Ukrainian', {
-            'fields': ('alt_uk',)
-        }),
-        ('Alt Text - Russian', {
-            'fields': ('alt_ru',)
-        }),
-    )
 
-@admin.register(ServiceArticleImage)
-class ServiceArticleImageAdmin(admin.ModelAdmin):
-    list_display = ("article", "sort", "alt_en")
-    list_filter = ("article__service",)
-    search_fields = ("article__title_en", "article__title_uk", "article__title_ru", "alt_en", "alt_uk", "alt_ru")
-    fieldsets = (
-        ('Image Info', {
-            'fields': ('article', 'image', 'sort')
-        }),
-        ('Alt Text - English', {
-            'fields': ('alt_en',)
-        }),
-        ('Alt Text - Ukrainian', {
-            'fields': ('alt_uk',)
-        }),
-        ('Alt Text - Russian', {
-            'fields': ('alt_ru',)
-        }),
-    )
+# ─── Section ─────────────────────────────────────────────────────────────────
 
 class SectionImageInline(admin.TabularInline):
     model = SectionImage
     extra = 1
+    fields = ("image", "alt_en", "alt_uk", "alt_ru", "sort")
 
-class SectionArticleImageInline(admin.TabularInline):
-    model = SectionArticleImage
-    extra = 1
 
 class SectionArticleInline(admin.TabularInline):
     model = SectionArticle
     extra = 1
-    fields = ("title_en", "text_en", "sort", "is_published")
+    fields = ("title_uk", "title_en", "sort", "is_published")
+    show_change_link = True
+
 
 @admin.register(Section)
 class SectionAdmin(admin.ModelAdmin):
-    list_display = ("slug", "title_en", "is_published", "updated_at")
+    list_display = ("slug", "title_uk", "title_en", "is_published", "updated_at")
     list_filter = ("is_published",)
-    search_fields = ("slug", "title_en", "title_uk", "title_ru", "body_en", "body_uk", "body_ru")
+    search_fields = ("slug", "title_en", "title_uk", "title_ru")
+    prepopulated_fields = {"slug": ("title_en",)}
     fieldsets = (
-        ('Service Info', {
-            'fields': ('slug', 'is_published')
-        }),
-        ('English', {
-            'fields': ('title_en', 'subtitle_en', 'body_en', 'seo_title_en', 'seo_description_en')
-        }),
-        ('Ukrainian', {
-            'fields': ('title_uk', 'subtitle_uk', 'body_uk', 'seo_title_uk', 'seo_description_uk')
-        }),
-        ('Russian', {
-            'fields': ('title_ru', 'subtitle_ru', 'body_ru', 'seo_title_ru', 'seo_description_ru')
-        }),
+        ("Meta", {"fields": ("slug", "is_published")}),
+        ("Ukrainian", {"fields": ("title_uk", "subtitle_uk", "body_uk", "seo_title_uk", "seo_description_uk")}),
+        ("English", {"fields": ("title_en", "subtitle_en", "body_en", "seo_title_en", "seo_description_en")}),
+        ("Russian", {"fields": ("title_ru", "subtitle_ru", "body_ru", "seo_title_ru", "seo_description_ru")}),
     )
     inlines = [SectionImageInline, SectionArticleInline]
 
+
 @admin.register(SectionArticle)
 class SectionArticleAdmin(admin.ModelAdmin):
-    list_display = ("title_en", "section", "sort", "is_published", "updated_at")
+    list_display = ("title_uk", "section", "sort", "is_published", "updated_at")
     list_filter = ("is_published", "section")
-    search_fields = ("title_en", "title_uk", "title_ru", "text_en", "text_uk", "text_ru")
+    search_fields = ("title_en", "title_uk", "title_ru")
     fieldsets = (
-        ('Article Info', {
-            'fields': ('service', 'sort', 'is_published')
-        }),
-        ('English', {
-            'fields': ('title_en', 'subtitle_en', 'text_en', 'seo_title_en', 'seo_description_en')
-        }),
-        ('Ukrainian', {
-            'fields': ('title_uk', 'subtitle_uk', 'text_uk', 'seo_title_uk', 'seo_description_uk')
-        }),
-        ('Russian', {
-            'fields': ('title_ru', 'subtitle_ru', 'text_ru', 'seo_title_ru', 'seo_description_ru')
-        }),
+        ("Meta", {"fields": ("section", "sort", "is_published")}),
+        ("Ukrainian", {"fields": ("title_uk", "subtitle_uk", "text_uk", "seo_title_uk", "seo_description_uk")}),
+        ("English", {"fields": ("title_en", "subtitle_en", "text_en", "seo_title_en", "seo_description_en")}),
+        ("Russian", {"fields": ("title_ru", "subtitle_ru", "text_ru", "seo_title_ru", "seo_description_ru")}),
     )
-    inlines = [SectionArticleImageInline]
+    inlines = [
+        type("SectionArticleImageInline", (admin.TabularInline,), {
+            "model": SectionArticleImage, "extra": 1,
+            "fields": ("image", "alt_en", "alt_uk", "alt_ru", "sort"),
+        })
+    ]
 
-@admin.register(SectionArticleImage)
-class SectionArticleImageAdmin(admin.ModelAdmin):
-    list_display = ("article", "sort", "alt_en")
-    list_filter = ("article__section",)
-    search_fields = ("article__title_en", "article__title_uk", "article__title_ru", "alt_en", "alt_uk", "alt_ru")
-    fieldsets = (
-        ('Image Info', {
-            'fields': ('article', 'image', 'sort')
-        }),
-        ('Alt Text - English', {
-            'fields': ('alt_en',)
-        }),
-        ('Alt Text - Ukrainian', {
-            'fields': ('alt_uk',)
-        }),
-        ('Alt Text - Russian', {
-            'fields': ('alt_ru',)
-        }),
-    )
+
+# ─── Contacts ────────────────────────────────────────────────────────────────
 
 @admin.register(Contacts)
 class ContactsAdmin(admin.ModelAdmin):
-    list_display = ("title_en", "phone1", "phone2", "phone3", "updated_at")
-    search_fields = ("title_en", "title_uk", "title_ru", "phone1", "phone2", "phone3")
+    list_display = ("__str__", "email", "phone1", "telegram", "updated_at")
     fieldsets = (
-        ('Contact Info', {
-            'fields': ('phone1', 'phone2', 'phone3')
-        }),
-        ('English', {
-            'fields': ('title_en', 'text_en', 'address_en')
-        }),
-        ('Ukrainian', {
-            'fields': ('title_uk', 'text_uk', 'address_uk')
-        }),
-        ('Russian', {
-            'fields': ('title_ru', 'text_ru', 'address_ru')
-        }),
+        ("Contact channels", {"fields": ("phone1", "phone2", "phone3", "email", "telegram", "viber", "whatsapp")}),
+        ("Ukrainian", {"fields": ("title_uk", "text_uk", "address_uk")}),
+        ("English", {"fields": ("title_en", "text_en", "address_en")}),
+        ("Russian", {"fields": ("title_ru", "text_ru", "address_ru")}),
     )
+
+
+# ─── Blog ─────────────────────────────────────────────────────────────────────
+
+@admin.register(BlogPost)
+class BlogPostAdmin(admin.ModelAdmin):
+    list_display = ("slug", "title_uk", "is_published", "published_at", "updated_at")
+    list_filter = ("is_published",)
+    search_fields = ("slug", "title_en", "title_uk", "title_ru")
+    prepopulated_fields = {"slug": ("title_en",)}
+    fieldsets = (
+        ("Meta", {"fields": ("slug", "cover_image", "is_published", "published_at")}),
+        ("Ukrainian", {"fields": ("title_uk", "subtitle_uk", "body_uk", "seo_title_uk", "seo_description_uk")}),
+        ("English", {"fields": ("title_en", "subtitle_en", "body_en", "seo_title_en", "seo_description_en")}),
+        ("Russian", {"fields": ("title_ru", "subtitle_ru", "body_ru", "seo_title_ru", "seo_description_ru")}),
+    )
+
+
+# ─── FAQ ──────────────────────────────────────────────────────────────────────
+
+@admin.register(FAQ)
+class FAQAdmin(admin.ModelAdmin):
+    list_display = ("question_uk", "category", "sort", "is_published")
+    list_filter = ("is_published", "category")
+    search_fields = ("question_en", "question_uk", "question_ru")
+    fieldsets = (
+        ("Meta", {"fields": ("category", "sort", "is_published")}),
+        ("Ukrainian", {"fields": ("question_uk", "answer_uk")}),
+        ("English", {"fields": ("question_en", "answer_en")}),
+        ("Russian", {"fields": ("question_ru", "answer_ru")}),
+    )
+
+
+# ─── Pricing ─────────────────────────────────────────────────────────────────
+
+@admin.register(PricingPlan)
+class PricingPlanAdmin(admin.ModelAdmin):
+    list_display = ("slug", "name_uk", "is_featured", "sort", "is_published")
+    list_filter = ("is_published", "is_featured")
+    search_fields = ("slug", "name_en", "name_uk", "name_ru")
+    prepopulated_fields = {"slug": ("name_en",)}
+    fieldsets = (
+        ("Meta", {"fields": ("slug", "sort", "is_featured", "is_published")}),
+        ("Ukrainian", {"fields": ("name_uk", "description_uk", "features_uk", "price_display_uk")}),
+        ("English", {"fields": ("name_en", "description_en", "features_en", "price_display_en")}),
+        ("Russian", {"fields": ("name_ru", "description_ru", "features_ru", "price_display_ru")}),
+    )
+
+
+# ─── Consultation Requests ────────────────────────────────────────────────────
+
+@admin.register(ConsultationRequest)
+class ConsultationRequestAdmin(admin.ModelAdmin):
+    list_display = ("name", "contact_method", "email", "phone", "is_read", "created_at")
+    list_filter = ("is_read", "contact_method")
+    search_fields = ("name", "email", "phone", "message")
+    readonly_fields = ("name", "email", "phone", "contact_method", "message", "created_at")
+    list_editable = ("is_read",)
+
+    def has_add_permission(self, request):
+        return False
